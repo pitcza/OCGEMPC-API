@@ -21,8 +21,16 @@ module.exports = (sequelize, DataTypes) => {
     },
     action: {
       type: DataTypes.ENUM(
-        'login', 'logout', 'create loan', 'approve loan', 'decline loan'),
+        'login', 'logout', 'create loan', 'approve loan', 'decline loan', 'deleted loan', 'updated loan'),
       allowNull: false,
+    },
+    description: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    related_data: {
+      type: DataTypes.JSON,
+      allowNull: true
     },
     createdAt: {
       type: DataTypes.DATE,

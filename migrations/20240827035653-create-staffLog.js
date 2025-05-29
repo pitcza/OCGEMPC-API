@@ -15,8 +15,17 @@ module.exports = {
         allowNull: false,
       },
       action: {
-        type: Sequelize.ENUM('login', 'logout'),
-        allowNull: false,
+      type: Sequelize.ENUM(
+        'login', 'logout', 'create loan', 'approve loan', 'decline loan', 'deleted loan', 'updated loan'),
+      allowNull: false,
+      },
+      description: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      related_data: {
+        type: Sequelize.JSON,
+        allowNull: true
       },
       createdAt: {
         allowNull: false,

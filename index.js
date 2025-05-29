@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
 const loadDbPermission = require('./middleware/loadUserPermissionMiddleware');
+const encryptResponseMiddleware = require('./middleware/encryptResponseMiddleware');
 const appRoutes = require('./routes/appRoutes');
 const db = require('./models');
 const helmet = require('helmet');
@@ -18,7 +19,8 @@ app.use(bodyParser.json());
 app.use(loadDbPermission);
 app.use(cors());
 
-app.use('/api', appRoutes);
+// app.use('/api', appRoutes);
+app.use('/api', encryptResponseMiddleware, appRoutes)
 
 app.get('/', function (req, res) {
   const htmlResponse = `
