@@ -3,6 +3,7 @@ const permit = (permittedRoles = [], permittedPermissions = []) => {
       const user = req.user; 
 
       if (!user) {
+          console.warn('Permission denied: No user found in request.');
           return res.status(401).json({ error: 'Unauthorized' });
       }
 
