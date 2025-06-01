@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     description: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     related_data: {
       type: DataTypes.JSON,

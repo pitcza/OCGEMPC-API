@@ -29,10 +29,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    employer: {
-      type: DataTypes.STRING,
-      allowNull: true
-    },
     status: {
       type: DataTypes.ENUM('Active', 'Inactive'),
       allowNull: false,

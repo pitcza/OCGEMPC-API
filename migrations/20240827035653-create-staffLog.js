@@ -21,7 +21,7 @@ module.exports = {
       },
       description: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       related_data: {
         type: Sequelize.JSON,
