@@ -116,7 +116,7 @@ const addUser = async (req, res) => {
        Username: ${username},
        Password: ${password},
        Role: ${role_name}
-       Please login to the app at https://www.facebook.com/
+       Please login to the app at https://ocgempc.vercel.app/
        `,
       `
   <!DOCTYPE html>
@@ -124,7 +124,7 @@ const addUser = async (req, res) => {
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EBJV Account Request</title>
+    <title>OCGEMPC Account Request</title>
     <style>
         /* Reset styles */
         * {
@@ -278,14 +278,14 @@ const addUser = async (req, res) => {
              Visit the app through the link below to get started.
             </p>
   
-            <a href="https://facebook.com/" class="button">
+            <a href="https://ocgempc.vercel.app/" class="button">
                 Head to the App
             </a>
         </div>
   
         <div class="footer">
-            EBJV<br>
-            Australia
+            OCGEMPC<br>
+            Olongapo City, Zambales
         </div>
     </div>
   </body>

@@ -21,7 +21,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     action: {
       type: DataTypes.ENUM(
-        'login', 'logout', 'create loan', 'approve loan', 'decline loan', 'deleted loan', 'updated loan'),
+        'login', 'logout', 'create loan', 'approve loan', 'decline loan', 'deleted loan', 'updated loan',
+        'update insurance', 'delete insurance', 'update maker', 'delete maker'
+      ),
       allowNull: false,
     },
     description: {

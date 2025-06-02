@@ -38,6 +38,7 @@ const getMakerById = async (req, res) => {
 };
 
 const updateMaker = async (req, res) => {
+  const userId  = req.user.id;
   try {
     const maker = await makers.findByPk(req.params.id);
     if (!maker) {
@@ -45,6 +46,8 @@ const updateMaker = async (req, res) => {
     }
 
     await maker.update(req.body);
+    // Log action
+    await staff_logs.create({ user_id: userId, action: 'update maker'});
     res.status(200).json(maker);
   } catch (err) {
     res.status(500).json({ message: 'Failed to update maker', error: err });
@@ -52,6 +55,7 @@ const updateMaker = async (req, res) => {
 };
 
 const deleteMaker = async (req, res) => {
+  const userId  = req.user.id;
   try {
     const maker = await makers.findByPk(req.params.id);
     if (!maker) {
@@ -59,6 +63,8 @@ const deleteMaker = async (req, res) => {
     }
 
     await maker.destroy();
+    // Log action
+    await staff_logs.create({ user_id: userId, action: 'delete maker'});
     res.status(204).send();
   } catch (err) {
     res.status(500).json({ message: 'Failed to delete maker', error: err });

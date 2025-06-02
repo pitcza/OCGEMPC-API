@@ -58,13 +58,15 @@ const getInsuranceById = async (req, res) => {
 };
 
 const updateInsurance = async (req, res) => {
+  const userId  = req.user.id;
   try {
     const record = await loan_insurances.findByPk(req.params.id);
     if (!record) return res.status(404).json({ message: 'Record not found' });
     await record.update(req.body);
-    res.json(record);
+    await staff_logs.create({ user_id: userId, action: 'update insurance'});
+    res.status(200).json({message: 'Insurance updated successfully', record});
   } catch (err) {
-    res.status(500).json({ message: 'Failed to update record', error: err });
+    res.status(500).json({ message: 'Failed to update insurance record', error: err });
   }
 };
 
@@ -73,7 +75,7 @@ const deleteInsurance = async (req, res) => {
     const record = await loan_insurances.findByPk(req.params.id);
     if (!record) return res.status(404).json({ message: 'Record not found' });
     await record.destroy();
-    res.status(204).send();
+    res.status(204).send({message: 'Insurance record deleted successfully'});
   } catch (err) {
     res.status(500).json({ message: 'Failed to delete record', error: err });
   }

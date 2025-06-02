@@ -233,7 +233,8 @@ const createLoan = async (req, res) => {
       maker, 
       comaker,
       loan, 
-      amortizationSchedule 
+      amortizationSchedule,
+      insurance
     });
   } catch (err) {
       await transaction.rollback();
@@ -274,13 +275,14 @@ const getLoanById = async (req, res) => {
 
 // Update Loan
 const updateLoan = async (req, res) => {
+  const userId  = req.user.id;
   try {
     const loan = await loan_applications.findByPk(req.params.id);
     if (!loan) return res.status(404).json({ message: 'Loan not found' });
 
     await loan.update(req.body);
     // Log action
-    await staff_logs.create({ user_id: userId, action: 'updated loan'}, { transaction });
+    await staff_logs.create({ user_id: userId, action: 'updated loan'});
     res.status(200).json(loan);
   } catch (err) {
     res.status(500).json({ message: 'Error updating loan', error: err });
@@ -289,13 +291,14 @@ const updateLoan = async (req, res) => {
 
 // Delete Loan
 const deleteLoan = async (req, res) => {
+  const userId  = req.user.id;
   try {
     const loan = await loan_applications.findByPk(req.params.id);
     if (!loan) return res.status(404).json({ message: 'Loan not found' });
 
     await loan.destroy();
     // Log action
-    await staff_logs.create({ user_id: userId, action: 'deleted loan'}, { transaction });
+    await staff_logs.create({ user_id: userId, action: 'deleted loan'});
     res.status(204).send();
   } catch (err) {
     res.status(500).json({ message: 'Error deleting loan', error: err });
@@ -304,12 +307,13 @@ const deleteLoan = async (req, res) => {
 
 // Approve Loan
 const approveLoan = async (req, res) => {
+  const userId  = req.user.id;
   try {
     const loan = await loan_applications.findByPk(req.params.id);
     if (!loan) return res.status(404).json({ message: 'Loan not found' });
 
     await loan.update({ status: 'approved' });
-    await staff_logs.create({ user_id: req.user.id, action: 'approve loan'}, { transaction });
+    await staff_logs.create({ user_id: req.user.id, action: 'approve loan'});
 
     // const amortizationSchedule = generateAmortizationSchedule({
     //   loanAmount: parseFloat(loan.applied_amount),
@@ -332,13 +336,14 @@ const approveLoan = async (req, res) => {
 
 // Decline Loan
 const declineLoan = async (req, res) => {
+  const userId  = req.user.id;
   try {
     const loan = await loan_applications.findByPk(req.params.id);
     if (!loan) return res.status(404).json({ message: 'Loan not found' });
 
     await loan.update({ status: 'declined' });
     // Log action
-    await staff_logs.create({ user_id: userId, action: 'decline loan'}, { transaction });
+    await staff_logs.create({ user_id: userId, action: 'decline loan'});
     res.status(200).json({ message: 'Loan declined' });
   } catch (err) {
     res.status(500).json({ message: 'Error declining loan', error: err });

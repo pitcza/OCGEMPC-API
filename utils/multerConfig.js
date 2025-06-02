@@ -1,10 +1,10 @@
 const multer = require('multer');
 const path = require('path');
 
-// Set ifc file storage for multer
-const ifcStorage = multer.diskStorage({
+// Set  file storage for multer
+const loanStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'F:\\OCGEMPC_API\\uploads\\ifc-files\\');
+    cb(null, 'F:\\OCGEMPC_API\\uploads\\loan-applications\\');
   },
   filename: (req, file, cb) => {
     cb(null, `${file.originalname}`);
@@ -12,9 +12,9 @@ const ifcStorage = multer.diskStorage({
 });
 
 // Set thumbnail file storage for multer
-const thumbnailStorage = multer.diskStorage({
+const loanInsurances = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'F:\\OCGEMPC_API\\uploads\\project-thumbnails\\');
+    cb(null, 'F:\\OCGEMPC_API\\uploads\\loan-insurances\\');
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`);
@@ -23,14 +23,14 @@ const thumbnailStorage = multer.diskStorage({
 
 
 // File filter for images/videos only
-const ifcFilter = (req, file, cb) => {
-  const allowedExtensions = /ifc|nc1|dxf|pdf|frag|json/;
+const loanFilter = (req, file, cb) => {
+  const allowedExtensions = /pdf|docx|csv|xlsx/;
   const extName = allowedExtensions.test(path.extname(file.originalname).toLowerCase());
 
   if (extName) {
     return cb(null, true);
   } else {
-    cb(new Error("Only IFC, NC1, DXF & PDF Files are allowed!"));
+    cb(new Error("Only PDF, DOCX, CSV and XLSX Files are allowed!"));
   }
 };
 
@@ -49,14 +49,14 @@ const imageFilter = (req, file, cb) => {
 
 // Set multer options
 const ifcUpload = multer({
-  storage: ifcStorage,
-  fileFilter: ifcFilter,
+  storage: loanStorage,
+  fileFilter: loanFilter,
   limits: { fileSize: 100000000 } // 100MB file size limit
 });
 
 const imageUpload = multer({
-  storage: thumbnailStorage,
-  fileFilter: imageFilter,
+  storage: loanInsurances,
+  fileFilter: loanFilter,
   limits: { fileSize: 5000000 } // 50MB file size limit
 });
 
