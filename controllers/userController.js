@@ -509,7 +509,7 @@ const resetPassword = async (req, res) => {
     });
 
     // Send reset email
-    const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
+    const resetUrl = `https://ocgempc.vercel.app/forgot-password/${resetToken}`;
     await sendEmail(user.email, 'Password Reset Request', `Please click the following link to reset your password: ${resetUrl}`);
 
     res.status(200).json({ message: 'Password reset email sent.' });
