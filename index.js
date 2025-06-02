@@ -3,7 +3,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 // const cors = require('cors');
 const corsMiddleware = require('./middleware/corsConfig');
-const path = require('path');
+const rateLimiter = require('./middleware/rateLimiter');
+const requestLogger = require('./middleware/requestLogger');
+const sanitize = require('./middleware/sanitizerMiddleware');
+// const path = require('path');
 const loadDbPermission = require('./middleware/loadUserPermissionMiddleware');
 const encryptResponseMiddleware = require('./middleware/encryptResponseMiddleware');
 const appRoutes = require('./routes/appRoutes');
@@ -18,10 +21,12 @@ app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 app.use(bodyParser.json());
 app.use(loadDbPermission);
-app.use(corsMiddleware());
+app.use(corsMiddleware);
+app.use(requestLogger);
 
 // app.use('/api', appRoutes);
-app.use('/api', encryptResponseMiddleware, appRoutes)
+//  add sanitize for sanitizing inputs
+app.use('/api', rateLimiter, encryptResponseMiddleware, appRoutes)
 
 app.get('/', function (req, res) {
   const htmlResponse = `

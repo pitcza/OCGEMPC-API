@@ -1,7 +1,41 @@
+const winston = require('winston');
+require('winston-daily-rotate-file');
+const path = require('path');
+
+// Configure Winston for error logging with daily rotation
+const logDir = path.join(__dirname, '../logs');
+const errorTransport = new winston.transports.DailyRotateFile({
+  dirname: logDir,
+  filename: 'error-%DATE%.log',
+  datePattern: 'YYYY-MM-DD',
+  zippedArchive: true,
+  maxSize: '20m',
+  maxFiles: '30d', // Keep error logs for 30 days
+  level: 'error',
+});
+
+const errorLogger = winston.createLogger({
+  level: 'error',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.errors({ stack: true }),
+    winston.format.printf(
+      ({ timestamp, level, message, stack }) =>
+        `[${timestamp}] ${level.toUpperCase()}: ${message}${stack ? `\n${stack}` : ''}`
+    )
+  ),
+  transports: [
+    errorTransport,
+    new winston.transports.Console()
+  ],
+});
 
 function errorHandler(err, req, res, next) {
-  // Log error stack for debugging
-  console.error('Error:', err.stack || err);
+  // Log error details with Winston
+  errorLogger.error(
+    `${req.method} ${req.originalUrl} - ${err.message}`,
+    { stack: err.stack }
+  );
 
   // Handle Joi validation errors
   if (err.isJoi) {
