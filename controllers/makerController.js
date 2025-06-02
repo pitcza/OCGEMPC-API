@@ -1,4 +1,4 @@
-const { makers, loan_applications, loan_amortizations } = require('../models');
+const { makers, loan_applications, loan_amortizations, staff_logs } = require('../models');
 
 const createMaker = async (req, res) => {
   try {
