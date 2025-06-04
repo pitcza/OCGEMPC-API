@@ -84,4 +84,4 @@ app.get('/', function (req, res) {
   res.send(htmlResponse);
 });
 
-app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));
+app.listen(PORT, () => console.log(`Listening on port ${PORT}: http://localhost:${PORT}`));
