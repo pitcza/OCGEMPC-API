@@ -54,6 +54,11 @@ module.exports = {
         type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
       },
+      status: {
+        type: Sequelize.ENUM('fully paid', 'partially paid', 'unpaid'),
+        allowNull: false,
+        defaultValue: 'unpaid'
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

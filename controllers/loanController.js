@@ -17,7 +17,7 @@ const getTotalApplicationsThisMonth =  async (req, res) => {
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
 
-  const loanCount =  loan_applications.count({
+  const loanCount =  await loan_applications.count({
     where: {
       createdAt: {
         [Op.between]: [startOfMonth, endOfMonth]
@@ -71,7 +71,7 @@ const getTotalActiveLoans = async (req, res) => {
 
 const getTotalPaidLoans = async (req, res) => {
   try {
-    const [results] = await sequelize.query(`
+    const [results] = await db.sequelize.query(`
     SELECT la.id
     FROM loan_applications la
     JOIN loan_amortizations lam ON lam.loan_id = la.id
@@ -83,12 +83,13 @@ const getTotalPaidLoans = async (req, res) => {
 
   res.status(200).json({ message: 'success', totalPaidLoans });
   } catch (error) {
-   res.status(500).json({message: 'Failed to fetch total paid loans', error})
+   res.status(500).json({message: 'Failed to fetch total paid loans', error: error})
   }
 }
 
 const getApplicationsbyMonth = async (req, res) => {
   try {
+    const year = req.query.year ? parseInt(req.query.year, 10) : new Date().getFullYear()
     const result = await loan_applications.findAll({
     attributes: [
       [fn('DATE_FORMAT', col('createdAt'), '%Y-%m'), 'month'],
@@ -130,7 +131,7 @@ const getApplicationsPerStatus = async (req, res) => {
 
 const getMostRecentPayments = async (req, res) => {
   try {
-    const mostRecentPayments =  loan_amortizations.findAll({
+    const mostRecentPayments =  await loan_amortizations.findAll({
       order: [['createdAt', 'DESC']],
       limit: 10,
       raw: true
@@ -192,57 +193,89 @@ const generateLoanInsurance = ({loan, transaction}) => {
 
 // Create Loan
 const createLoan = async (req, res) => {
-  const userId  = req.user.id;
+  const userId = req.user.id;
   const transaction = await db.sequelize.transaction();
   try {
-    //added these for creation of maker and comakers on the dbAdd commentMore actions
-    const maker = await makers.create(req.body, { transaction });
-    const comaker = await comakers.create(req.body.co_maker, { transaction });
+    //  Maker Logic -> if existing, fetches by id; else, creates new one
+    let maker;
+    if (req.body.maker_id) {
+      maker = await makers.findByPk(req.body.maker_id, { transaction });
+      if (!maker) {
+        await transaction.rollback();
+        return res.status(400).json({ message: 'Maker not found' });
+      }
+    } else {
+      maker = await makers.create(req.body, { transaction });
+    }
 
-    //same as before for the creatioin of loan data but added maker id
-    const loanData = { ...req.body, maker_id: maker.id};
+    // Comaker logic, employs same logic as maker
+    let comaker;
+    if (req.body.co_maker_id) {
+      comaker = await comakers.findByPk(req.body.co_maker_id, { transaction });
+      if (!comaker) {
+        await transaction.rollback();
+        return res.status(400).json({ message: 'Comaker not found' });
+      }
+    } else {
+      comaker = await comakers.create(req.body.co_maker, { transaction });
+    }
+
+    // Loan Creation Logic
+    const loanData = { ...req.body, maker_id: maker.id };
     const loan = await loan_applications.create(loanData, { transaction });
 
-    //for the loan-comaker table to associate the comaker to the specific loan
-    await db.loan_comakers.create({ loan_id: loan.id, comaker_id: comaker.id}, { transaction });
+    // Assigning loan comaker
+    await db.loan_comakers.create({ loan_id: loan.id, comaker_id: comaker.id }, { transaction });
 
-    // Auto-generate amortization
+    // callback to generateAmortizationSchedule function, auto generates schedule upon submission
     const amortizationSchedule = generateAmortizationSchedule({
       loanAmount: parseFloat(loan.applied_amount),
       termMonths: loan.loan_term,
-      interestRate: 12  // Adjust as needed
+      interestRate: 12 // Adjust as needed
     });
-
     const amortizationRecords = amortizationSchedule.map(item => ({
       loan_id: loan.id,
       ...item
     }));
+    await loan_amortizations.bulkCreate(amortizationRecords, { transaction });
 
-    // populate loan amortization table
-    await loan_amortizations.bulkCreate(amortizationRecords, {transaction});
+    // Populate insurance related data
+    const insurance = await generateLoanInsurance({ loan, transaction });
 
-    // Auto-generate loan insurance
-    const insurance = await generateLoanInsurance({loan, transaction});
+    // Populate required documents values
+    // Assume files are sent as booleans
+    // If files are present, bool val = true
+    // If files are not present, bool val = false
+    const docPayload = {
+      maker_id: maker.id,
+      payslip: !!req.body.payslip,
+      valid_id: !!req.body.valid_id,
+      company_id: !!req.body.company_id,
+      proof_of_billing: !!req.body.proof_of_billing,
+      employment_details: !!req.body.employment_details,
+      barangay_clearance: !!req.body.barangay_clearance
+    };
+    await required_documents.create(docPayload, { transaction });
 
     // Log action
-    await staff_logs.create({ user_id: userId, action: 'create loan'}, { transaction });
+    await staff_logs.create({ user_id: userId, action: 'create loan' }, { transaction });
 
     await transaction.commit();
-
-    res.status(201).json({ 
-      maker, 
+    res.status(201).json({
+      maker,
       comaker,
-      loan, 
+      loan,
       amortizationSchedule,
-      insurance
+      insurance,
+      required_documents: docPayload
     });
   } catch (err) {
-      await transaction.rollback();
-      console.error(err);
-      res.status(500).json({ 
-        message: 'Loan creation failed', 
-        error: err.message 
-      });
+    await transaction.rollback();
+    console.error(err);
+    res.status(500).json({
+      message: 'Loan creation failed',
+      error: err.message
+    });
   }
 };
 
@@ -250,7 +283,7 @@ const createLoan = async (req, res) => {
 const getAllLoans = async (req, res) => {
   try {
     const loans = await loan_applications.findAll({
-      include: [makers, comakers, loan_amortizations, loan_insurances]
+     include: [makers, comakers, loan_amortizations, loan_insurances]
     });
     res.status(200).json(loans);
   } catch (err) {
@@ -272,6 +305,24 @@ const getLoanById = async (req, res) => {
     res.status(500).json({ message: 'Error retrieving loan', error: err });
   }
 };
+
+const getLoanByMakerId = async (req, res) => {
+  const userId = req.params.id;
+  try {
+    if(!userId) return res.status(400).json({ message: 'User ID is required' });
+    const loan = await loan_applications.findAll({
+      where: {
+        maker_id: userId
+      },
+      include: [makers, comakers, loan_amortizations, loan_insurances],
+      order: [['createdAt', 'DESC']], 
+    });
+    if (!loan) return res.status(404).json({ message: 'Loan not found' });
+    res.status(200).json(loan);
+  } catch (err) {
+    res.status(500).json({ message: 'Error retrieving loans', error: err });
+  }
+}
 
 // Update Loan
 const updateLoan = async (req, res) => {
@@ -354,7 +405,7 @@ const declineLoan = async (req, res) => {
 module.exports = {
   createLoan,
   getAllLoans,
-  getLoanById,
+  getLoanById, getLoanByMakerId,
   updateLoan,
   deleteLoan,
   approveLoan,

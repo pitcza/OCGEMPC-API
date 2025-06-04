@@ -6,20 +6,24 @@ module.exports = (sequelize, DataTypes ) => {
         static associate(models){
             Makers.hasMany(models.loan_applications, {
                 foreignKey: 'maker_id',
-            })
+            });
 
             Makers.hasMany(models.loan_amortizations, {
                 foreignKey: "maker_id",
-            })
+            });
 
             Makers.hasMany(models.loan_insurances, {
               foreignKey: 'maker_id'
-            })
+            });
+
+            Makers.hasOne(models.required_documents, {
+              foreignKey: 'maker_id'
+            });
         }
     }
 
     Makers.init({
-        first_name: {
+      first_name: {
       type: DataTypes.STRING,
       allowNull: false
     },

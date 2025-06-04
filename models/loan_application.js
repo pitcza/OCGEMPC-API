@@ -11,14 +11,13 @@ module.exports = (sequelize, DataTypes) => {
 
         LoanApplication.belongsTo(models.makers, {
             foreignKey: "maker_id",
-        }),
+        });
         LoanApplication.hasMany(models.loan_amortizations, {
           foreignKey: 'loan_id'
         });
-
         LoanApplication.hasOne(models.loan_insurances, {
           foreignKey: 'loan_id'
-        })
+        });
     }
   }
 
@@ -53,7 +52,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     loan_status: {
-        type: DataTypes.ENUM('pending', 'approved', 'declined'),
+        type: DataTypes.ENUM('pending', 'approved', 'declined', 'completed', 'overdue'),
         allowNull: false,
         defaultValue: 'pending'  
     },

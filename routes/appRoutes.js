@@ -99,6 +99,7 @@ router.delete('/delete-maker', makerController.deleteMaker);
 // Loan Routes
 router.get('/loans', loanController.getAllLoans);
 router.get('/loan/:id', loanController.getLoanById);
+router.get('/loan/maker/:id', loanController.getLoanByMakerId);
 router.post('/create-loan', loanController.createLoan);
 router.put('/update-loan/:id', loanController.updateLoan);
 router.delete('/delete-loan/:id', loanController.deleteLoan);

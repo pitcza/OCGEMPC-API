@@ -39,7 +39,7 @@ module.exports = {
         allowNull: false,
       },
       loan_status: {
-          type: Sequelize.ENUM('pending', 'approved', 'declined'),
+          type: Sequelize.ENUM('pending', 'approved', 'declined', 'completed', 'overdue'),
           allowNull: false,
           defaultValue: 'pending'  
       },

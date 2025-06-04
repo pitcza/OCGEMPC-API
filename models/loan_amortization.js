@@ -55,6 +55,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
+    status: {
+      type: DataTypes.ENUM('fully paid', 'partially paid', 'unpaid'),
+      allowNull: false,
+      defaultValue: 'unpaid'
+    }
   }, {
     sequelize,
     modelName: 'loan_amortizations',
