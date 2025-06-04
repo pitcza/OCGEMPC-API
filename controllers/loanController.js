@@ -285,7 +285,7 @@ const getAllLoans = async (req, res) => {
     const loans = await loan_applications.findAll({
      include: [makers, comakers, loan_amortizations, loan_insurances]
     });
-    res.status(200).json(loans);
+    res.status(200).json({message: 'Loans retrieved successfully', loans});
   } catch (err) {
     res.status(500).json({ message: 'Error fetching loans', error: err });
   }
@@ -300,7 +300,7 @@ const getLoanById = async (req, res) => {
 
     if (!loan) return res.status(404).json({ message: 'Loan not found' });
 
-    res.status(200).json(loan);
+    res.status(200).json({message: 'Loan retrieved successfully', loan});
   } catch (err) {
     res.status(500).json({ message: 'Error retrieving loan', error: err });
   }
@@ -318,7 +318,7 @@ const getLoanByMakerId = async (req, res) => {
       order: [['createdAt', 'DESC']], 
     });
     if (!loan) return res.status(404).json({ message: 'Loan not found' });
-    res.status(200).json(loan);
+    res.status(200).json({message: `Loan retrieved successfully`, loan});
   } catch (err) {
     res.status(500).json({ message: 'Error retrieving loans', error: err });
   }
@@ -334,7 +334,7 @@ const updateLoan = async (req, res) => {
     await loan.update(req.body);
     // Log action
     await staff_logs.create({ user_id: userId, action: 'updated loan'});
-    res.status(200).json(loan);
+    res.status(200).json({message: 'Loan updated successfully', loan});
   } catch (err) {
     res.status(500).json({ message: 'Error updating loan', error: err });
   }
@@ -364,7 +364,7 @@ const approveLoan = async (req, res) => {
     if (!loan) return res.status(404).json({ message: 'Loan not found' });
 
     await loan.update({ status: 'approved' });
-    await staff_logs.create({ user_id: req.user.id, action: 'approve loan'});
+    await staff_logs.create({ user_id: userId, action: 'approve loan'});
 
     // const amortizationSchedule = generateAmortizationSchedule({
     //   loanAmount: parseFloat(loan.applied_amount),
