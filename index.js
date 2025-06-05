@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
-// const cors = require('cors');
+const cors = require('cors');
 const corsMiddleware = require('./middleware/corsConfig');
 const rateLimiter = require('./middleware/rateLimiter');
 const requestLogger = require('./middleware/requestLogger');
@@ -22,6 +22,7 @@ app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 app.use(bodyParser.json());
 app.use(loadDbPermission);
 app.use(corsMiddleware);
+// app.use(cors());
 app.use(requestLogger);
 
 // app.use('/api', appRoutes);
