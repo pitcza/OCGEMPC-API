@@ -170,15 +170,19 @@ const generateAmortizationSchedule = ({ loanAmount, termMonths, interestRate }) 
 
 const generateLoanInsurance = ({loan, transaction}) => {
   const certificate_no = `CERT-${loan.id}`;
+  const billing_statement_no = `BILL-${loan.id}`;
   const full_name = `${loan.first_name} ${loan.middle_name ?? ''} ${loan.last_name}`.trim();
   const effective_date = dayjs().format('YYYY-MM-DD');
   const expiry_date = dayjs().add(loan.loan_term, 'month').format('YYYY-MM-DD');
   const sum_insured = parseFloat(loan.applied_amount);
   const monthly_premium = (sum_insured / 1000) * 1.041667;
+  const annual_premium = monthly_premium * 12;
   const gross_premium = monthly_premium * loan.loan_term;
 
   return loan_insurances.create({
     loan_id: loan.id,
+    maker_id: loan.maker_id,
+    billing_statement_no,
     certificate_no,
     full_name,
     age: loan.age,
@@ -187,6 +191,8 @@ const generateLoanInsurance = ({loan, transaction}) => {
     expiry_date,
     term: loan.loan_term,
     sum_insured,
+    monthly_premium,
+    annual_premium,
     gross_premium
   }, { transaction });
 }
