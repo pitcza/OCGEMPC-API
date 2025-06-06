@@ -211,9 +211,7 @@ const createLoan = async (req, res) => {
         await transaction.rollback();
         return res.status(400).json({ message: 'Maker not found' });
       }
-    } else {
-      maker = await makers.create(req.body, { transaction });
-    }
+    } 
 
     // Comaker logic, employs same logic as maker
     let comaker;
@@ -223,10 +221,8 @@ const createLoan = async (req, res) => {
         await transaction.rollback();
         return res.status(400).json({ message: 'Comaker not found' });
       }
-    } else {
-      comaker = await comakers.create(req.body.co_maker, { transaction });
     }
-
+    
     // Loan Creation Logic
     const loanData = { ...req.body, maker_id: maker.id };
     const loan = await loan_applications.create(loanData, { transaction });
