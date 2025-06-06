@@ -5,7 +5,8 @@ const {
   makers,
   loan_amortizations,
   loan_insurances, 
-  staff_logs
+  staff_logs,
+  required_documents
 } = db;
 const dayjs = require('dayjs');
 const { Op, fn, col, literal } = require('sequelize');
@@ -421,3 +422,4 @@ module.exports = {
   getApplicationsbyMonth, getApplicationsPerStatus,
   getMostRecentPayments
 };
+
