@@ -1,5 +1,5 @@
-const leven = require("leven");
-const { metaphone } = require("metaphone");
+// const leven = require("leven"); disabled for now
+// const { metaphone } = require("metaphone"); disabled for now
 
 module.exports = {
   // For string comparison (names, addresses)
@@ -9,12 +9,14 @@ module.exports = {
     // Basic equality
     if (str1.toLowerCase() === str2.toLowerCase()) return 1;
 
-    // Phonetic similarity
-    if (metaphone(str1) === metaphone(str2)) return 0.9;
+    // // Phonetic similarity
+    // if (metaphone(str1) === metaphone(str2)) return 0.9; disabled for now
 
     // Normalized Levenshtein
-    const maxLen = Math.max(str1.length, str2.length);
-    return 1 - leven(str1, str2) / maxLen;
+    // const maxLen = Math.max(str1.length, str2.length);
+    // return 1 - leven(str1, str2) / maxLen;
+
+    return 0.6; //default return for now
   },
 
   // For numeric comparison (salary, amounts)
