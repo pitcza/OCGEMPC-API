@@ -56,6 +56,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: 'pending'  
     },
+    status_details: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     supporting_documents: {
       type: DataTypes.JSON,
       allowNull: false

@@ -90,11 +90,20 @@ router.delete('/delete-log/:id', staffLogController.deleteStaffLog);
 router.post('/mass-delete-logs/', staffLogController.massDeleteLogs);
 
 // Maker Routes
+router.post('/makers/check-duplicate', makerController.checkDuplicateMaker)
 router.get('/makers', makerController.getAllMakers);
 router.get('/maker/:id', makerController.getMakerById);
 router.post('/create-maker', makerController.createMaker);
 router.put('/update-maker/:id', makerController.updateMaker);
 router.delete('/delete-maker', makerController.deleteMaker);
+
+
+// comaker routes
+router.get('/comakers', makerController.getAllComakers);
+router.get('/comaker/:id', makerController.getComakerById);
+router.post('/create-comaker', makerController.createComaker);
+router.put('/update-comaker/:id', makerController.updateComaker);
+router.delete('/delete-comaker', makerController.deleteComaker);
 
 // Loan Routes
 router.get('/loans', loanController.getAllLoans);
@@ -105,6 +114,9 @@ router.put('/update-loan/:id', loanController.updateLoan);
 router.delete('/delete-loan/:id', loanController.deleteLoan);
 router.post('/approve-loan/:id', loanController.approveLoan);
 router.post('/decline-loan/:id', loanController.declineLoan);
+
+// loan amortization routes
+router.patch('/amortization/:id/status', loanController.updateAmortizationStatus);
 
 // Dashboard Routes 
 router.get('/total-monthly-applications', loanController.getApplicationsbyMonth);

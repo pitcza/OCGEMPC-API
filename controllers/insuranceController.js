@@ -1,7 +1,8 @@
 // Loan Insurance CRUD Controller
 const {
   loan_applications,
-  loan_insurances
+  loan_insurances,
+  makers
 } = require('../models');
 
 const dayjs = require('dayjs');
@@ -40,12 +41,21 @@ const createInsurance = async (req, res) => {
 
 const getAllInsurances = async (req, res) => {
   try {
-    const records = await loan_insurances.findAll();
+    const records = await loan_insurances.findAll({
+      include: {
+        model: makers,
+        as: 'maker',
+        attributes: {
+          exclude: ['createdAt', 'updatedAt']
+        }
+      }
+    });
     res.json(records);
   } catch (err) {
     res.status(500).json({ message: 'Failed to fetch insurance records', error: err });
   }
 };
+
 
 const getInsuranceById = async (req, res) => {
   try {
