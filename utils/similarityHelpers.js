@@ -1,4 +1,4 @@
-const leven = require("leven").default || require("leven");
+const leven = require("leven");
 const { metaphone } = require("metaphone");
 
 module.exports = {
