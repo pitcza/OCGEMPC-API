@@ -13,9 +13,10 @@
 
   "production": {
    "username": "root",
-    "password": "BWTlwrQnQsQJCZgggvqdcZzUxDWPjUjm",
+    "password": "CvocLsQtPfVAPtZEQXIUuzthKBImaDVg",
     "database": "railway",
-    "host": "mysql.railway.internal",
+    "host": "nozomi.proxy.rlwy.net",
+    "port": 15126,
     "dialect": "mysql",
     "dialectOptions": {
         "ssl": false

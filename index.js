@@ -1,3 +1,4 @@
+process.env.NODE_ENV = 'production';
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -24,6 +25,21 @@ app.use(loadDbPermission);
 app.use(corsMiddleware);
 // app.use(cors());
 app.use(requestLogger);
+
+const allowedOrigins = [
+  'https://ocgempc.vercel.app'
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 
 // app.use('/api', appRoutes);
 //  add sanitize for sanitizing inputs
@@ -86,3 +102,12 @@ app.get('/', function (req, res) {
 });
 
 app.listen(PORT, () => console.log(`Listening on port ${PORT}: http://localhost:${PORT}`));
+
+db.sequelize.authenticate()
+  .then(() => {
+    console.log('Database connected...');
+    app.listen(PORT, '0.0.0.0', () => console.log(`Listening on port: ${PORT}`));
+  })
+  .catch(err => {
+    console.error('Unable to connect to the database:', err);
+  });
