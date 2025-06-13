@@ -43,6 +43,10 @@ module.exports = {
           allowNull: false,
           defaultValue: 'pending'  
       },
+      status_details: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       supporting_documents: {
       type: Sequelize.JSON,
       allowNull: false
