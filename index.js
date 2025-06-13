@@ -26,21 +26,6 @@ app.use(corsMiddleware);
 // app.use(cors());
 app.use(requestLogger);
 
-const allowedOrigins = [
-  'https://ocgempc.vercel.app'
-];
-
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
-
 // app.use('/api', appRoutes);
 //  add sanitize for sanitizing inputs
 app.use('/api', rateLimiter, encryptResponseMiddleware, appRoutes)
